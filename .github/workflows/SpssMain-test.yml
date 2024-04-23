@@ -5,8 +5,6 @@ on:
 
 jobs:  
   Variables:  
-    environment:
-      name: test  
     runs-on: ubuntu-latest
     outputs:
       buildenv: ${{ steps.srv-variab.outputs.build_env }}
