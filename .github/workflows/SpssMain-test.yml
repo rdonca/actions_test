@@ -9,13 +9,13 @@ jobs:
       name: test  
     runs-on: ubuntu-latest
     outputs:
-      benv: ${{ steps.srv-variab.outputs.buildenv }}
+      buildenv: ${{ steps.srv-variab.outputs.build_env }}
 
     steps:
     - name: Set Server Variables
       id: srv-variab
       run: |
-       echo "buildenv=test" >> "$GITHUB_OUTPUT"
+       echo "build_env=test" >> "$GITHUB_OUTPUT"
        if [[ ${{ github.env }} == "dev" ]]; then
         echo 'ser_vers=[{"server":"GBLON3-DIMDONST.EXTRANET.IEXT","env":"dev"}]' >> $GITHUB_OUTPUT
        elif [[ ${{ github.ref_name }} == "test" ]]; then
@@ -28,12 +28,12 @@ jobs:
 
     - name: Show Server Variables
       run: |
-        echo "buildenv ${{ steps.srv-variab.outputs.buildenv }}"
+        echo "buildenv ${{ steps.srv-variab.outputs.buil_denv }}"
         echo "env ${{ env.name }}"
 
   Call-SpssBuild:
     needs: Variables
     uses: ./.github/workflows/SpssBuild.yml
     with:
-        buildenv: ${{ needs.Variables.outputs.benv }}
+        buildenv: ${{ needs.Variables.outputs.buildenv }}
     secrets: inherit

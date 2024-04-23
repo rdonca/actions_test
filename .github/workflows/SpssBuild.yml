@@ -3,13 +3,13 @@ name: Build and Pack
 on:
   workflow_call:
     inputs:
-      benv:
+      buildenv:
         required: true
         type: string
       
 jobs:
-  BuildAndPack:
-    environement: ${{ benv }}
+  environement: ${{ inputs.buildenv }}
+  BuildAndPack:    
     runs-on: windows-2019
     steps:
     
