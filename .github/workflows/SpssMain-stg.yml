@@ -1,38 +1,22 @@
 name: SPSSCustomApps Main - STG env, manual
 
-on:
+on: 
   workflow_dispatch:
 
-jobs:
-  Variables:   
+jobs:  
+  Variables:  
     environment:
-      name: stg 
+      name: stg  
     runs-on: ubuntu-latest
     outputs:
-      currentbranch: ${{ steps.branch-name.outputs.current_branch }}
-      packageversion: ${{ steps.package-version.outputs.package_version }}
-      repopath: ${{ steps.repo-path.outputs.repo_path }}
-      servers: ${{ steps.srv-variab.outputs.ser_vers }}
+      buildenv: ${{ steps.srv-variab.outputs.build_env }}
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Get branch name
-      id: branch-name
-      uses: tj-actions/branch-names@v6
-
-    - name: Set package version
-      id: package-version
-      run : echo "package_version=1.0.0+${{ github.run_number }}" >> $GITHUB_OUTPUT
-    
-    - name: Set Repo path
-      id: repo-path
-      run : echo "repo_path=c:\GitHubWorkspace\Repo\SPSSCustomApps" >> $GITHUB_OUTPUT
-    
     - name: Set Server Variables
       id: srv-variab
       run: |
-       if [[ ${{ github.ref_name }} == "dev" ]]; then
+       echo "build_env=stg" >> "$GITHUB_OUTPUT"
+       if [[ ${{ github.env }} == "dev" ]]; then
         echo 'ser_vers=[{"server":"GBLON3-DIMDONST.EXTRANET.IEXT","env":"dev"}]' >> $GITHUB_OUTPUT
        elif [[ ${{ github.ref_name }} == "test" ]]; then
         echo 'ser_vers=[{"server":"GBLON3-DIMTONST.EXTRANET.IEXT","env":"test"}]' >> $GITHUB_OUTPUT
@@ -44,37 +28,12 @@ jobs:
 
     - name: Show Server Variables
       run: |
-        echo "currentbranch ${{ steps.branch-name.outputs.current_branch }}"
-        echo "packageversion ${{ steps.package-version.outputs.package_version }}"
-        echo "repopath ${{ steps.repo-path.outputs.repo_path }}"
-        echo "servers ${{ steps.srv-variab.outputs.ser_vers }}"
-        echo "env ${{ github.env }}"
+        echo "buildenv ${{ steps.srv-variab.outputs.buil_denv }}"
+        echo "env ${{ env.name }}"
 
   Call-SpssBuild:
     needs: Variables
     uses: ./.github/workflows/SpssBuild.yml
     with:
-        currentbranch: ${{ needs.Variables.outputs.currentbranch }}
-        packageversion: ${{ needs.Variables.outputs.packageversion }}
-    secrets: inherit
-
-  Call-SpssDownloadArtifact:
-    if: github.ref_name == 'dev' 
-    needs: [Variables, Call-SpssBuild]
-    uses: ./.github/workflows/SpssDownloadArtifacts.yml
-    with:
-        currentbranch: ${{ needs.Variables.outputs.currentbranch }}
-        packageversion: ${{ needs.Variables.outputs.packageversion }}
-        repopath: ${{ needs.Variables.outputs.repopath }}
-    secrets: inherit
-
-  Call-SpssPushArtifact:
-    if: github.ref_name == 'dev'
-    needs: [Variables, Call-SpssDownloadArtifact]
-    uses: ./.github/workflows/SpssPushArtifacts.yml
-    with:
-        currentbranch: ${{ needs.Variables.outputs.currentbranch }}
-        packageversion: ${{ needs.Variables.outputs.packageversion }}
-        repopath: ${{ needs.Variables.outputs.repopath }}
-        servers: ${{ needs.Variables.outputs.servers }}
+        buildenv: ${{ needs.Variables.outputs.buildenv }}
     secrets: inherit
