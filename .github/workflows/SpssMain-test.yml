@@ -28,7 +28,7 @@ jobs:
 
     - name: Show Server Variables
       run: |
-        echo "buildenv ${{ buildenv }}"
+        echo "buildenv ${{ steps.srv-variab.outputs.buildenv }}"
         echo "env ${{ env.name }}"
 
   Call-SpssBuild:
