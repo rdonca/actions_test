@@ -1,0 +1,39 @@
+name: SPSSCustomApps Main - TEST env, manual
+
+on: 
+  workflow_dispatch:
+
+jobs:  
+  Variables:  
+    environment:
+      name: test  
+    runs-on: ubuntu-latest
+    outputs:
+      benv: ${{ steps.srv-variab.outputs.buildenv }}
+
+    steps:
+    - name: Set Server Variables
+      id: srv-variab
+      run: |
+       echo "buildenv=test" >> "$GITHUB_OUTPUT"
+       if [[ ${{ github.env }} == "dev" ]]; then
+        echo 'ser_vers=[{"server":"GBLON3-DIMDONST.EXTRANET.IEXT","env":"dev"}]' >> $GITHUB_OUTPUT
+       elif [[ ${{ github.ref_name }} == "test" ]]; then
+        echo 'ser_vers=[{"server":"GBLON3-DIMTONST.EXTRANET.IEXT","env":"test"}]' >> $GITHUB_OUTPUT
+       elif [[ ${{ github.ref_name }} == "staging" ]]; then
+        echo 'ser_vers=[{"server":"server.stageenv","env":"staging"}]' >> $GITHUB_OUTPUT
+       elif [[ ${{ github.ref_name }} == "production" ]]; then
+        echo 'ser_vers=[{"server":"1247668-lrappservers01.extranet.iext","env":"N/A"},{"server":"1247670-lrappservers02.extranet.iext","env":"N/A"},{"server":"1247671-lrappservers09.extranet.iext","env":"N/A"},{"server":"1247672-lrappservers10.extranet.iext","env":"N/A"},{"server":"1247852-www01.extranet.iext","env":"N/A"},{"server":"1247854-www02.extranet.iext","env":"N/A"},{"server":"1247855-www05.extranet.iext","env":"N/A"}]' >> $GITHUB_OUTPUT
+       fi
+
+    - name: Show Server Variables
+      run: |
+        echo "buildenv ${{ buildenv }}"
+        echo "env ${{ env.name }}"
+
+  Call-SpssBuild:
+    needs: Variables
+    uses: ./.github/workflows/SpssBuild.yml
+    with:
+        buildenv: ${{ needs.Variables.outputs.benv }}
+    secrets: inherit
