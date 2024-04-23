@@ -8,14 +8,14 @@ on:
         type: string
       
 jobs:
-  environement: ${{ inputs.buildenv }}
-  BuildAndPack:    
+  
+  BuildAndPack:   
+    environment: 
+      name: ${{ inputs.buildenv }} 
     runs-on: windows-2019
     steps:
     
     - name: Show Server Variables - LinkReview v6
       run: |
-        echo "LR_QT_CONNSTRING_S ${{ secrets.LR_QT_CONNSTRING_S }}"
-        echo LR_SOAP_ADSERVICE ${{ vars.LR_SOAP_ADSERVICE }}
-        echo "LR_LOG_PATH ${{ vars.LR_LOG_PATH }}"
-        echo "env.name ${{ github.env.name }}"
+        echo "VAR1_1 ${{ vars.VAR1_1 }}"
+        echo "env.name ${{ inputs.buildenv }}"
